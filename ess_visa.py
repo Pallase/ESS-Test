@@ -8,8 +8,8 @@ class TEST_XM:
         self.rm = visa.ResourceManager()
         self.ports = None
         self.models = None
+        self.port_status = None
         self.start_time = None
-        self.elapsed_time = None
 
     def get_rm(self):
         return self.rm
@@ -22,15 +22,20 @@ class TEST_XM:
         #self.models = [self.rm.open_resource(port) for port in self.ports]
         try:
             self.models = self.rm.open_resource('USB0::0x05E6::0x2110::1374051::INSTR')
+            self.port_status = True
         except:
             print('error: usb?')
             self.models = None
+            self.port_status = False
             #self.models = self.rm.open_resource(self.ports[0])
         #return self.models
 
     def get_ports(self):
         return self.ports
         #return self.models
+
+    def get_port_status(self):
+        return self.port_status
 
     def reset(self):
         self.models.write('*RST')

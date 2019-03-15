@@ -55,6 +55,25 @@ class GUI(tk.Frame):
         self.sheet_name_entry.grid(row = 3, column = 3)
         ##############################
 
+        ### UNIT WIDGET ###
+        self.unit_title = tk.StringVar(self, value ="PLO")
+
+        self.unit_title_label = ttk.Label(self, text = "Chart Title: ")
+        self.unit_title_label.grid(row = 4, column = 2, padx = 5, sticky = "W")
+
+        self.unit_title_entry = ttk.Entry(self, width = 25, textvariable = self.unit_title)
+        self.unit_title_entry.grid(row = 4, column = 3)
+
+        ### VOLT WIDGET ###
+        self.volt_axis = tk.StringVar(self, value ="LD Voltage")
+
+        self.volt_axis_label = ttk.Label(self, text = "Voltage Detect: ")
+        self.volt_axis_label.grid(row = 5, column = 2, padx = 5, sticky = "W")
+
+        self.volt_axis_entry = ttk.Entry(self, width = 25, textvariable = self.volt_axis)
+        self.volt_axis_entry.grid(row = 5, column = 3)
+        ##############################
+
         ### START TEST WIDGET ###
         self.start_test = tk.Button(self, text = 'Start Test', command = lambda : start_test())
         self.start_test.grid(row = 7, column = 3, sticky = "E")
@@ -130,7 +149,7 @@ class ThreadedClient:
         to yield control pretty regularly, by select or otherwise.
         """
 
-        if (self.vco.get_port_status() == True):
+        if (self.ess.get_port_status() == True):
             self.ess.start_timer()
             self.initialize_xl()
 
@@ -155,7 +174,7 @@ class ThreadedClient:
 
             while True:
                 if (self.running is False):
-                        break
+                    break
                 else:
                     values = self.ess.measure()
                     voltage = abs(values[0])
@@ -168,7 +187,7 @@ class ThreadedClient:
                     data = [time_elapsed[0], float(voltage), float(temp)]
                     self.queue.put([time_elapsed[2], float(voltage), float(temp)])
                     self.xl.write_xl(data)
-                    time.sleep(30)
+                    time.sleep(1)
 
             end = self.ess.end_timer()
 
@@ -194,23 +213,23 @@ class ThreadedClient:
             self.queue.put('Data saved!\n')
 
     def get_port_status(self):
-        if (self.vco.get_port_status() == True):
+        if (self.ess.get_port_status() == True):
             self.queue.put('Closing port...')
-            self.vco.close_ports()
+            self.ess.close_ports()
             time.sleep(1)
             self.queue.put('Port closed!\n')
             self.gui.port_status.set("Open Port")
 
         else:
             self.queue.put('Opening port...')
-            self.vco.open_ports()
+            self.ess.open_ports()
             time.sleep(1)
             self.queue.put('Port Opened!\n')
             self.gui.port_status.set("Close Port")
 
     def initialize_xl(self):
         file_name = self.gui.sheet_name.get() + '.xlsx'
-        self.xl = TEST_XL(file_name)
+        self.xl = TEST_XL(file_name, self.gui.unit_title.get(), self.gui.volt_axis.get())
 
         self.queue.put('Initializing xl sheet...')
         time.sleep(3)

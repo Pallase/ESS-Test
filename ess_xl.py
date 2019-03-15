@@ -1,6 +1,6 @@
 from openpyxl import Workbook
 from openpyxl import load_workbook
-from openpyxl.compat import range
+#from openpyxl.compat import range
 from openpyxl.utils import get_column_letter
 from openpyxl.chart import ScatterChart, Reference, Series
 from openpyxl.chart.text import RichText
@@ -14,13 +14,13 @@ from openpyxl.drawing.text import (
     )
 
 class TEST_XL():
-    def __init__(self,fileName):
+    def __init__(self,fileName,chart_title,axis_title):
         self.wb = None
         self.ws = None
         self.chart = None
-        self.chart.title = None
-        self.chart.y_axis.title = None
+        self.chart_title = chart_title
         self.aux_chart = None
+        self.axis_title = axis_title
         self.sheet_name = 'ESS Test'
         self.fileName = fileName
 
@@ -74,7 +74,7 @@ class TEST_XL():
         self.ws.column_dimensions["B"].width = 12
         self.ws.column_dimensions["C"].width = 12
 
-        header = ['Time', 'Voltage', 'Temp.(C)']
+        header = ['Time', 'voltage', 'temp.']
 
         self.write_xl(header)
 
@@ -91,10 +91,14 @@ class TEST_XL():
         self.chart.style = 13
         self.chart.height = 10
         self.chart.width = 15
+        self.chart.title = self.chart_title
+        self.chart.legend.position = 'b'
 
         self.chart.x_axis.title = 'Elapsed Time(hours)'
         self.chart.x_axis.number_format = 'h:mm:ss'
         self.chart.x_axis.scaling.min = 0
+        
+        self.chart.y_axis.title = self.axis_title
 
         self.aux_chart = ScatterChart()
         self.aux_chart.y_axis.axId = 200
@@ -120,9 +124,9 @@ class TEST_XL():
 
         target_chart.x_axis.txPr = rtp8
         target_chart.y_axis.txPr = rtp8
-        target_chart.x_axis.title.tx.rich.p[0].pPr = pp10
+        self.chart.x_axis.title.tx.rich.p[0].pPr = pp10
         target_chart.y_axis.title.tx.rich.p[0].pPr = pp10
-        target_chart.title.tx.rich.p[0].pPr = pp12
+        self.chart.title.tx.rich.p[0].pPr = pp12
 
     def graph_data(self):
         last_row = self.get_max_row()
