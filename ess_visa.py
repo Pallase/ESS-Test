@@ -64,7 +64,7 @@ class TEST_XM:
         time_list = [formatted_time, sec, time_string]
         return time_list
 
-    def end_time(self):
+    def end_timer(self):
         self.elapsed_time = time.time() - self.start_time
         formatted_time = self.format_time(math.floor(self.elapsed_time))
         #return self.elapsed_time
